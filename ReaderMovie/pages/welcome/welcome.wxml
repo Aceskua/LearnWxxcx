@@ -1,0 +1,7 @@
+<view>
+  <image class='user-avatar' src='/images/avatar.jpg'></image>
+  <text>hello,skua</text>
+  <view>
+    <text>开启小程序之旅</text>
+  </view>
+</view>
