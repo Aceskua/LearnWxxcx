@@ -14,6 +14,7 @@ Page({
    */
   onLoad: function(options) {
     var postId = options.id;
+    this.data.currentPostId = postId;
     var postData = postsData.postList[postId];
     //如果在onLoad方法中，不是异步的去执行一个数据绑定
     //则不需要使用this.setData方法
@@ -23,6 +24,62 @@ Page({
     this.setData({
       postData: postData
     });
+
+    // var postsCollected = {
+    //   1: "true",
+    //   2: "true",
+    // }
+
+    var postsCollected = wx.getStorageSync('posts_collected');
+    if (postsCollected) {
+      var postCollected = postsCollected[postId];
+      //更新数据绑定变量，从而实现切换图片
+      if (postCollected) {
+        this.setData({
+          collected: postCollected
+        });
+      }
+      // else{
+      //   this.setData({
+      //     collected: postCollected
+      //   });
+      // }
+    } else {
+      var postsCollected = {};
+      postsCollected[postId] = false;
+      wx.setStorageSync('posts_collected', postsCollected)
+    }
+  },
+
+  onCollectionTap: function(event) {
+    var postsCollected = wx.getStorageSync('posts_collected');
+    var postCollected = postsCollected[this.data.currentPostId];
+    //收藏变成未收藏，未收藏变成收藏
+    postCollected = !postCollected;
+    postsCollected[this.data.currentPostId] = postCollected;
+    wx.setStorageSync('posts_collected', postsCollected);
+    this.setData({
+      collected: postCollected
+    });
+
+    wx.showToast({
+      title: postCollected ? '收藏成功' : '取消成功',
+    });
+  },
+
+  onShareTap: function(event) {
+    wx.showActionSheet({
+      itemList: [
+        "分享给微信好友",
+        "分享到朋友圈",
+        "分享到QQ",
+        "分享到微博"
+      ],
+      itemColor: "#405f80",
+      success:function(res){
+        
+      }
+    })
   },
 
   /**
