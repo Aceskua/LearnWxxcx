@@ -1,4 +1,5 @@
 var postsData = require('../../../data/posts-data.js') //只能用相对路径，用绝对路径会报错
+var app = getApp();
 
 Page({
 
@@ -6,7 +7,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-
+    isPlayingMusic: false
   },
 
   /**
@@ -49,6 +50,29 @@ Page({
       postsCollected[postId] = false;
       wx.setStorageSync('posts_collected', postsCollected)
     }
+
+    if (app.globalData.g_isPlayingMusic && app.globalData.g_currentMusicPostId === postId) {
+      this.setData({
+        isPlayingMusic: true
+      });
+    }
+
+    var that = this;
+    wx.onBackgroundAudioPlay(function() {
+      that.setData({
+        isPlayingMusic: true
+      });
+      app.globalData.g_isPlayingMusic = true;
+      app.globalData.g_currentMusicPostId = that.data.currentPostId;
+    });
+
+    wx.onBackgroundAudioPause(function() {
+      that.setData({
+        isPlayingMusic: false
+      });
+      app.globalData.g_isPlayingMusic = false;
+      app.globalData.g_currentMusicPostId = null;
+    })
   },
 
   onCollectionTap: function(event) {
@@ -76,10 +100,30 @@ Page({
         "分享到微博"
       ],
       itemColor: "#405f80",
-      success:function(res){
-        
+      success: function(res) {
+
       }
-    })
+    });
+  },
+
+  onMusicTap: function(event) {
+    var currentPostId = this.data.currentPostId;
+    var isPlayingMusic = this.data.isPlayingMusic;
+    if (isPlayingMusic) {
+      wx.pauseBackgroundAudio();
+      this.setData({
+        isPlayingMusic: false
+      });
+    } else {
+      wx.playBackgroundAudio({
+        dataUrl: postsData.postList[currentPostId].music.url,
+        title: postsData.postList[currentPostId].music.title,
+        coverImgUrl: postsData.postList[currentPostId].music.coverImg
+      });
+      this.setData({
+        isPlayingMusic: true
+      });
+    }
   },
 
   /**
