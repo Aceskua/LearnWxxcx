@@ -38,6 +38,13 @@ Page({
     util.http(dataUrl, this.processDoubanData);
   },
 
+  onMovieTap: function(event) {
+    var movieId = event.currentTarget.dataset.movieid;
+    wx.navigateTo({
+      url: '../movie-detail/movie-detail?id=' + movieId,
+    });
+  },
+
   processDoubanData: function(data) {
     var movies = [];
     for (var idx in data.subjects) {
@@ -109,6 +116,7 @@ Page({
     var refreshUrl = this.data.requestUrl + '?start=0&count=20';
     this.data.movies = {};
     this.data.isEmpty = true;
+    this.data.totalCount = 0;
     util.http(refreshUrl, this.processDoubanData);
     wx.showNavigationBarLoading();
   },
